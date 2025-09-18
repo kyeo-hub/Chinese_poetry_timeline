@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@radix-ui/react-tooltip"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { formatLifeSpan } from "@/lib/utils"
@@ -31,6 +32,13 @@ interface Dynasty {
 interface TimelineProps {
   poets: Poet[]
   dynasties: Dynasty[]
+}
+
+
+interface TooltipProps {
+  content: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
 }
 
 export function Timeline({ poets, dynasties }: TimelineProps) {
@@ -152,6 +160,34 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
     const maxYear = 1200 // End of classical period
     const range = maxYear - minYear
     return ((year - minYear) / range) * 100
+  }
+  
+  // 获取实际数据的时间范围
+  const getDataTimeRange = () => {
+    const startYears = dynasties.map(d => d.start_year).filter((y): y is number => y !== null)
+    const endYears = dynasties.map(d => d.end_year).filter((y): y is number => y !== null)
+    
+    if (startYears.length === 0 || endYears.length === 0) {
+      return { min: -800, max: 1200 }
+    }
+    
+    return {
+      min: Math.min(...startYears),
+      max: Math.max(...endYears)
+    }
+  }
+
+  // 根据实际数据范围计算位置
+  const getAdjustedTimelinePosition = (year: number | null) => {
+    if (!year) return 0
+    
+    const { min: dataMin, max: dataMax } = getDataTimeRange()
+    const dataRange = dataMax - dataMin
+    
+    // 避免除零错误
+    if (dataRange === 0) return 0
+    
+    return ((year - dataMin) / dataRange) * 100
   }
 
   const goToPreviousPoet = () => {
@@ -313,12 +349,11 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
       </div>
 
       {/* Dynasty markers */}
-      <div className="relative mt-12 h-20">
+      <div className="relative mt-12 h-20 w-full">
         {dynasties.map((dynasty) => {
-          const startPos = getTimelinePosition(dynasty.start_year)
-          const endPos = getTimelinePosition(dynasty.end_year)
+          const startPos = getAdjustedTimelinePosition(dynasty.start_year)
+          const endPos = getAdjustedTimelinePosition(dynasty.end_year)
           const width = endPos - startPos
-          const markerPosition = startPos + width / 2 // 朝代中间位置
 
           return (
             <div
@@ -334,15 +369,46 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
                   ? "bg-primary" 
                   : "bg-muted-foreground"
               }`}></div>
-              <div className={`text-xs text-center transition-colors ${
+              <div className={`text-xs text-center transition-colors whitespace-nowrap ${
                 activeDynasty === dynasty.name 
                   ? "text-foreground font-bold" 
                   : "text-muted-foreground"
               }`}>
-                <div className="font-medium">{dynasty.name}</div>
-                <div>
-                  {dynasty.start_year && dynasty.end_year && formatLifeSpan(dynasty.start_year, dynasty.end_year)}
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="font-medium cursor-pointer">{dynasty.name}</div>
+                    </TooltipTrigger>
+                    <TooltipContent 
+                      side="bottom"
+                      align="center"
+                      className="bg-background border border-amber-800 rounded-md shadow-lg p-3 text-sm transition-opacity duration-300 ease-in-out"
+                      style={{
+                        maxWidth: '250px',
+                        minWidth: '150px',
+                        pointerEvents: 'none', // 防止tooltip干扰鼠标事件
+                        backgroundColor: 'rgba(255, 255, 240, 0.95)', // 淡米黄色背景增加历史感
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
+                        fontFamily: 'serif' // 使用衬线字体增加历史感
+                      }}
+                    >
+                      <div className="space-y-1">
+                        <div className="font-semibold text-foreground">{dynasty.name}</div>
+                        {dynasty.start_year && dynasty.end_year && (
+                          <div className="text-muted-foreground">
+                            {formatLifeSpan(dynasty.start_year, dynasty.end_year)}
+                          </div>
+                        )}
+                        {dynasty.description && (
+                          <div className="text-muted-foreground text-xs mt-1 italic break-words whitespace-normal">
+                            {dynasty.description}
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-amber-800"></div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           )
@@ -351,3 +417,6 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
     </div>
   )
 }
+
+
+

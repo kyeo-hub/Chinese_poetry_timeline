@@ -11,7 +11,8 @@ INSERT INTO dynasties (name, start_year, end_year, description) VALUES
 ('宋', 960, 1279, '宋代，词的兴盛时期'),
 ('元', 1271, 1368, '元代，散曲和杂剧的发展'),
 ('明', 1368, 1644, '明代诗歌'),
-('清', 1644, 1912, '清代诗歌');
+('清', 1644, 1912, '清代诗歌')
+ON CONFLICT (name) DO NOTHING;
 
 -- 插入著名诗人数据
 INSERT INTO poets (name, birth_year, death_year, dynasty, portrait_url, introduction, brief_tag) VALUES
@@ -86,7 +87,8 @@ INSERT INTO poets (name, birth_year, death_year, dynasty, portrait_url, introduc
 ('赵翼', 1727, 1814, '清', '/placeholder.svg?height=100&width=100', '清代文学家、史学家，与袁枚、蒋士铨合称"乾隆三大家"。', '史学家诗人'),
 ('龚自珍', 1792, 1841, '清', '/placeholder.svg?height=100&width=100', '清代思想家、诗人、文学家和改良主义的先驱者，其诗主张更法、改图。', '改良先驱'),
 ('黄遵宪', 1848, 1905, '清', '/placeholder.svg?height=100&width=100', '晚清著名诗人，外交家，政治家，"诗界革命"的一面旗帜。', '诗界革命'),
-('秋瑾', 1875, 1907, '清', '/placeholder.svg?height=100&width=100', '近代民主革命志士，女权和女学思想的倡导者，第一批为推翻封建统治而流血的先驱。', '鉴湖女侠');
+('秋瑾', 1875, 1907, '清', '/placeholder.svg?height=100&width=100', '近代民主革命志士，女权和女学思想的倡导者，第一批为推翻封建统治而流血的先驱。', '鉴湖女侠')
+ON CONFLICT (name, dynasty) DO NOTHING;
 
 -- 插入经典诗词数据
 INSERT INTO poems (title, poet_id, dynasty, writing_year, content, translation, appreciation, background) VALUES

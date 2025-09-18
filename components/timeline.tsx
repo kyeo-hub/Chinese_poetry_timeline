@@ -356,61 +356,60 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
           const width = endPos - startPos
 
           return (
-            <div
-              key={dynasty.id}
-              className={`absolute top-0 transform -translate-y-1/2 cursor-pointer ${
-                activeDynasty === dynasty.name ? "font-bold" : ""
-              }`}
-              style={{ left: `${startPos}%`, width: `${width}%` }}
-              onClick={() => jumpToDynasty(dynasty.name)}
-            >
-              <div className={`h-1 rounded-full mb-2 ${
-                activeDynasty === dynasty.name 
-                  ? "bg-primary" 
-                  : "bg-muted-foreground"
-              }`}></div>
-              <div className={`text-xs text-center transition-colors whitespace-nowrap ${
-                activeDynasty === dynasty.name 
-                  ? "text-foreground font-bold" 
-                  : "text-muted-foreground"
-              }`}>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+            <TooltipProvider key={dynasty.id}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`absolute top-0 transform -translate-y-1/2 cursor-pointer ${
+                      activeDynasty === dynasty.name ? "font-bold" : ""
+                    }`}
+                    style={{ left: `${startPos}%`, width: `${width}%` }}
+                    onClick={() => jumpToDynasty(dynasty.name)}
+                  >
+                    <div className={`h-1 rounded-full mb-2 ${
+                      activeDynasty === dynasty.name 
+                        ? "bg-primary" 
+                        : "bg-muted-foreground"
+                    }`}></div>
+                    <div className={`text-xs text-center transition-colors whitespace-nowrap ${
+                      activeDynasty === dynasty.name 
+                        ? "text-foreground font-bold" 
+                        : "text-muted-foreground"
+                    }`}>
                       <div className="font-medium cursor-pointer">{dynasty.name}</div>
-                    </TooltipTrigger>
-                    <TooltipContent 
-                      side="bottom"
-                      align="center"
-                      className="bg-background border border-amber-800 rounded-md shadow-lg p-3 text-sm transition-opacity duration-300 ease-in-out"
-                      style={{
-                        maxWidth: '250px',
-                        minWidth: '150px',
-                        pointerEvents: 'none', // 防止tooltip干扰鼠标事件
-                        backgroundColor: 'rgba(255, 255, 240, 0.95)', // 淡米黄色背景增加历史感
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
-                        fontFamily: 'serif' // 使用衬线字体增加历史感
-                      }}
-                    >
-                      <div className="space-y-1">
-                        <div className="font-semibold text-foreground">{dynasty.name}</div>
-                        {dynasty.start_year && dynasty.end_year && (
-                          <div className="text-muted-foreground">
-                            {formatLifeSpan(dynasty.start_year, dynasty.end_year)}
-                          </div>
-                        )}
-                        {dynasty.description && (
-                          <div className="text-muted-foreground text-xs mt-1 italic break-words whitespace-normal">
-                            {dynasty.description}
-                          </div>
-                        )}
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent 
+                  side="bottom"
+                  align="center"
+                  className="bg-background border border-amber-800 rounded-md shadow-lg p-3 text-sm transition-opacity duration-300 ease-in-out"
+                  style={{
+                    maxWidth: '250px',
+                    minWidth: '150px',
+                    pointerEvents: 'none', // 防止tooltip干扰鼠标事件
+                    backgroundColor: 'rgba(255, 255, 240, 0.95)', // 淡米黄色背景增加历史感
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
+                    fontFamily: 'serif' // 使用衬线字体增加历史感
+                  }}
+                >
+                  <div className="space-y-1">
+                    <div className="font-semibold text-foreground">{dynasty.name}</div>
+                    {dynasty.start_year && dynasty.end_year && (
+                      <div className="text-muted-foreground">
+                        {formatLifeSpan(dynasty.start_year, dynasty.end_year)}
                       </div>
-                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-amber-800"></div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
+                    )}
+                    {dynasty.description && (
+                      <div className="text-muted-foreground text-xs mt-1 italic break-words whitespace-normal">
+                        {dynasty.description}
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-amber-800"></div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )
         })}
       </div>

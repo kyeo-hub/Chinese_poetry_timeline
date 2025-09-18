@@ -16,7 +16,7 @@ export function formatYear(year: number | null): string {
   if (year > 0) {
     return `${year}年`
   } else {
-    return `${Math.abs(year)}年前`
+    return `公元前${Math.abs(year)}年`
   }
 }
 

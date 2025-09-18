@@ -24,17 +24,13 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <aside className="lg:col-span-1">
-            <div className="sticky top-8">
-              <PoetList poets={poets || []} dynasties={dynasties || []} />
-            </div>
-          </aside>
-
-          <section className="lg:col-span-3">
+      <div className="mx-auto px-4 py-8">
+          <section>
             <Timeline poets={poets || []} dynasties={dynasties || []} />
           </section>
+        
+        <div className="mt-8">
+          <PoetList poets={poets || []} dynasties={dynasties || []} />
         </div>
       </div>
     </main>

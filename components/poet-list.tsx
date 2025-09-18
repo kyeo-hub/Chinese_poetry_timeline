@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
-import { Search } from "lucide-react"
+import { Search, ChevronDown, ChevronRight } from "lucide-react"
+import { formatLifeSpan } from "@/lib/utils"
 
 interface Poet {
   id: number
@@ -34,6 +34,7 @@ interface PoetListProps {
 
 export function PoetList({ poets, dynasties }: PoetListProps) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [expandedDynasty, setExpandedDynasty] = useState<string | null>(null)
 
   const filteredPoets = poets.filter(
     (poet) =>
@@ -50,6 +51,10 @@ export function PoetList({ poets, dynasties }: PoetListProps) {
     {} as Record<string, Poet[]>,
   )
 
+  const toggleDynasty = (dynastyName: string) => {
+    setExpandedDynasty(expandedDynasty === dynastyName ? null : dynastyName)
+  }
+
   return (
     <Card className="h-fit">
       <CardHeader>
@@ -65,21 +70,46 @@ export function PoetList({ poets, dynasties }: PoetListProps) {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-[600px]">
-          <div className="p-4 space-y-4">
+        <div className="p-4">
+          {/* 朝代横向排列 */}
+          <div className="flex flex-wrap gap-2 mb-4">
             {dynasties.map((dynasty) => {
               const dynastyPoets = poetsByDynasty[dynasty.name] || []
               if (dynastyPoets.length === 0) return null
 
               return (
-                <div key={dynasty.id} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="default" className="text-xs">
-                      {dynasty.name}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">{dynastyPoets.length}位诗人</span>
-                  </div>
-                  <div className="space-y-2">
+                <div 
+                  key={dynasty.id}
+                  className="flex items-center gap-1 cursor-pointer hover:bg-muted/50 px-3 py-2 rounded-lg transition-colors"
+                  onClick={() => toggleDynasty(dynasty.name)}
+                >
+                  {expandedDynasty === dynasty.name ? (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <Badge variant="default" className="text-xs">
+                    {dynasty.name}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground ml-1">({dynastyPoets.length})</span>
+                </div>
+              )
+            })}
+          </div>
+          
+          {/* 展开的朝代诗人列表 */}
+          <div className="space-y-4">
+            {dynasties.map((dynasty) => {
+              const dynastyPoets = poetsByDynasty[dynasty.name] || []
+              if (dynastyPoets.length === 0 || expandedDynasty !== dynasty.name) return null
+
+              return (
+                <div key={`poets-${dynasty.id}`} className="space-y-2">
+                  <h3 className="font-medium text-foreground flex items-center gap-2">
+                    <Badge variant="secondary">{dynasty.name}</Badge>
+                    <span className="text-sm text-muted-foreground">{dynastyPoets.length}位诗人</span>
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {dynastyPoets.map((poet) => (
                       <Link key={poet.id} href={`/poet/${poet.id}`}>
                         <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
@@ -100,7 +130,7 @@ export function PoetList({ poets, dynasties }: PoetListProps) {
               )
             })}
           </div>
-        </ScrollArea>
+        </div>
       </CardContent>
     </Card>
   )

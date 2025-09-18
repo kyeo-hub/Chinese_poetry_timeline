@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Calendar, MapPin } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { formatLifeSpan } from "@/lib/utils"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -27,6 +28,14 @@ export default async function PoetDetailPage({ params }: PageProps) {
     .select("*")
     .eq("poet_id", id)
     .order("writing_year", { ascending: true })
+
+  // Fetch related poets
+  const { data: relatedPoets } = await supabase
+    .from("poets")
+    .select("id, name, brief_tag, portrait_url")
+    .eq("dynasty", poet.dynasty)
+    .neq("id", poet.id)
+    .limit(5)
 
   return (
     <main className="min-h-screen bg-background">
@@ -65,7 +74,7 @@ export default async function PoetDetailPage({ params }: PageProps) {
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
-                      {poet.birth_year > 0 ? poet.birth_year : Math.abs(poet.birth_year) + "前"}年 - {poet.death_year}年
+                      {formatLifeSpan(poet.birth_year, poet.death_year)}
                     </span>
                   </div>
                 )}
@@ -182,7 +191,27 @@ export default async function PoetDetailPage({ params }: PageProps) {
                   <CardTitle className="text-lg">同朝代诗人</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <RelatedPoets currentPoetId={poet.id} dynasty={poet.dynasty} />
+                  {relatedPoets && relatedPoets.length > 0 ? (
+                    <div className="space-y-3">
+                      {relatedPoets.map((relatedPoet) => (
+                        <Link key={relatedPoet.id} href={`/poet/${relatedPoet.id}`}>
+                          <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                            <img
+                              src={relatedPoet.portrait_url || "/placeholder.svg?height=32&width=32"}
+                              alt={relatedPoet.name}
+                              className="w-8 h-8 rounded-full object-cover border border-border"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-foreground">{relatedPoet.name}</div>
+                              {relatedPoet.brief_tag && <div className="text-xs text-muted-foreground">{relatedPoet.brief_tag}</div>}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">暂无同朝代诗人</div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -190,41 +219,6 @@ export default async function PoetDetailPage({ params }: PageProps) {
         </div>
       </div>
     </main>
-  )
-}
-
-async function RelatedPoets({ currentPoetId, dynasty }: { currentPoetId: number; dynasty: string }) {
-  const supabase = await createClient()
-
-  const { data: relatedPoets } = await supabase
-    .from("poets")
-    .select("id, name, brief_tag, portrait_url")
-    .eq("dynasty", dynasty)
-    .neq("id", currentPoetId)
-    .limit(5)
-
-  if (!relatedPoets || relatedPoets.length === 0) {
-    return <div className="text-sm text-muted-foreground">暂无同朝代诗人</div>
-  }
-
-  return (
-    <div className="space-y-3">
-      {relatedPoets.map((poet) => (
-        <Link key={poet.id} href={`/poet/${poet.id}`}>
-          <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
-            <img
-              src={poet.portrait_url || "/placeholder.svg?height=32&width=32"}
-              alt={poet.name}
-              className="w-8 h-8 rounded-full object-cover border border-border"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-foreground">{poet.name}</div>
-              {poet.brief_tag && <div className="text-xs text-muted-foreground">{poet.brief_tag}</div>}
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
   )
 }
 

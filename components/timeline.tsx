@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
+import { formatLifeSpan } from "@/lib/utils"
 
 interface Poet {
   id: number
@@ -38,6 +39,7 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
   const [currentPoetIndex, setCurrentPoetIndex] = useState(0)
   const timelineRef = useRef<HTMLDivElement>(null)
   const poetCardsRef = useRef<HTMLDivElement>(null)
+  const [activeDynasty, setActiveDynasty] = useState<string | null>(null)
 
   const filteredPoets = poets.filter((poet) => {
     const matchesDynasty = selectedDynasty ? poet.dynasty === selectedDynasty : true
@@ -49,6 +51,12 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
       : true
     return matchesDynasty && matchesSearch
   })
+
+  // 按朝代分组诗人
+  const groupedPoets = dynasties.map(dynasty => ({
+    ...dynasty,
+    poets: filteredPoets.filter(poet => poet.dynasty === dynasty.name)
+  })).filter(group => group.poets.length > 0)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -84,6 +92,13 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
   useEffect(() => {
     setCurrentPoetIndex(0)
   }, [selectedDynasty, searchTerm])
+
+  useEffect(() => {
+    // 更新当前朝代
+    if (filteredPoets.length > 0 && currentPoetIndex < filteredPoets.length) {
+      setActiveDynasty(filteredPoets[currentPoetIndex].dynasty)
+    }
+  }, [currentPoetIndex, filteredPoets])
 
   useEffect(() => {
     let startX = 0
@@ -147,6 +162,28 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
     setCurrentPoetIndex((prev) => (prev < filteredPoets.length - 1 ? prev + 1 : 0))
   }
 
+  // 跳转到指定朝代
+  const jumpToDynasty = (dynastyName: string) => {
+    setSelectedDynasty(dynastyName)
+    // 找到该朝代的第一个诗人并跳转到它
+    const firstPoetIndex = filteredPoets.findIndex(poet => poet.dynasty === dynastyName)
+    if (firstPoetIndex !== -1) {
+      setCurrentPoetIndex(firstPoetIndex)
+    }
+  }
+
+  // 滚动到指定诗人
+  useEffect(() => {
+    if (poetCardsRef.current && filteredPoets.length > 0 && currentPoetIndex < filteredPoets.length) {
+      const cardWidth = 320 // 估算每张卡片的宽度
+      const scrollPosition = currentPoetIndex * cardWidth - (poetCardsRef.current.clientWidth / 2) + (cardWidth / 2)
+      poetCardsRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      })
+    }
+  }, [currentPoetIndex, filteredPoets])
+
   return (
     <div className="space-y-8" ref={timelineRef}>
       <div className="space-y-4">
@@ -171,7 +208,7 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
             <Button
               key={dynasty.id}
               variant={selectedDynasty === dynasty.name ? "default" : "outline"}
-              onClick={() => setSelectedDynasty(dynasty.name)}
+              onClick={() => jumpToDynasty(dynasty.name)}
               className="text-sm"
             >
               {dynasty.name}
@@ -199,105 +236,117 @@ export function Timeline({ poets, dynasties }: TimelineProps) {
 
       <div className="text-xs text-muted-foreground text-center">使用 ← → 键导航，Enter 键查看详情，Esc 键清除筛选</div>
 
+      {/* 诗人卡片横向滚动区域 */}
       <div className="relative">
-        {/* Timeline line */}
-        <div className="timeline-line h-1 w-full mb-8"></div>
+        {filteredPoets.length > 0 ? (
+          <div 
+            ref={poetCardsRef}
+            className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x snap-mandatory"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {filteredPoets.map((poet, index) => (
+              <div key={poet.id} className="snap-start flex-shrink-0">
+                <Card
+                  className={`poet-card hover:shadow-lg transition-all duration-300 w-72 ${
+                    index === currentPoetIndex ? "ring-2 ring-primary shadow-lg" : ""
+                  }`}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <img
+                          src={poet.portrait_url || "/placeholder.svg?height=80&width=80"}
+                          alt={poet.name}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">{poet.name}</h3>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {poet.dynasty}
+                          </Badge>
+                          {poet.brief_tag && (
+                            <Badge variant="outline" className="text-xs">
+                              {poet.brief_tag}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {poet.birth_year && poet.death_year && (
+                            <span>
+                              {formatLifeSpan(poet.birth_year, poet.death_year)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{poet.introduction}</p>
+                        <Link href={`/poet/${poet.id}`}>
+                          <Button size="sm" className="w-full">
+                            了解更多
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <div className="text-muted-foreground mb-4">
+              <Search className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p>未找到匹配的诗人</p>
+              <p className="text-sm">请尝试调整搜索条件</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchTerm("")
+                setSelectedDynasty(null)
+              }}
+            >
+              清除筛选条件
+            </Button>
+          </div>
+        )}
+      </div>
 
-        {/* Dynasty markers */}
-        <div className="relative mb-12">
-          {dynasties.map((dynasty) => {
-            const startPos = getTimelinePosition(dynasty.start_year)
-            const endPos = getTimelinePosition(dynasty.end_year)
-            const width = endPos - startPos
+      {/* Dynasty markers */}
+      <div className="relative mt-12 h-20">
+        {dynasties.map((dynasty) => {
+          const startPos = getTimelinePosition(dynasty.start_year)
+          const endPos = getTimelinePosition(dynasty.end_year)
+          const width = endPos - startPos
+          const markerPosition = startPos + width / 2 // 朝代中间位置
 
-            return (
-              <div
-                key={dynasty.id}
-                className="absolute top-0 transform -translate-y-1/2"
-                style={{ left: `${startPos}%`, width: `${width}%` }}
-              >
-                <div className="dynasty-marker h-3 rounded-full mb-2"></div>
-                <div className="text-xs text-center text-muted-foreground">
-                  <div className="font-medium">{dynasty.name}</div>
-                  <div>
-                    {dynasty.start_year &&
-                      dynasty.end_year &&
-                      `${dynasty.start_year > 0 ? dynasty.start_year : Math.abs(dynasty.start_year) + "前"}年 - ${dynasty.end_year}年`}
-                  </div>
+          return (
+            <div
+              key={dynasty.id}
+              className={`absolute top-0 transform -translate-y-1/2 cursor-pointer ${
+                activeDynasty === dynasty.name ? "font-bold" : ""
+              }`}
+              style={{ left: `${startPos}%`, width: `${width}%` }}
+              onClick={() => jumpToDynasty(dynasty.name)}
+            >
+              <div className={`h-1 rounded-full mb-2 ${
+                activeDynasty === dynasty.name 
+                  ? "bg-primary" 
+                  : "bg-muted-foreground"
+              }`}></div>
+              <div className={`text-xs text-center transition-colors ${
+                activeDynasty === dynasty.name 
+                  ? "text-foreground font-bold" 
+                  : "text-muted-foreground"
+              }`}>
+                <div className="font-medium">{dynasty.name}</div>
+                <div>
+                  {dynasty.start_year && dynasty.end_year && formatLifeSpan(dynasty.start_year, dynasty.end_year)}
                 </div>
               </div>
-            )
-          })}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" ref={poetCardsRef}>
-          {filteredPoets.length > 0 ? (
-            filteredPoets.map((poet, index) => (
-              <Card
-                key={poet.id}
-                className={`poet-card hover:shadow-lg transition-all duration-300 ${
-                  index === currentPoetIndex ? "ring-2 ring-primary shadow-lg scale-105" : ""
-                }`}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <img
-                        src={poet.portrait_url || "/placeholder.svg?height=80&width=80"}
-                        alt={poet.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-primary/20"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-foreground mb-1">{poet.name}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {poet.dynasty}
-                        </Badge>
-                        {poet.brief_tag && (
-                          <Badge variant="outline" className="text-xs">
-                            {poet.brief_tag}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground mb-2">
-                        {poet.birth_year && poet.death_year && (
-                          <span>
-                            {poet.birth_year > 0 ? poet.birth_year : Math.abs(poet.birth_year) + "前"}年 -{" "}
-                            {poet.death_year}年
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{poet.introduction}</p>
-                      <Link href={`/poet/${poet.id}`}>
-                        <Button size="sm" className="w-full">
-                          了解更多
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <div className="text-muted-foreground mb-4">
-                <Search className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>未找到匹配的诗人</p>
-                <p className="text-sm">请尝试调整搜索条件</p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm("")
-                  setSelectedDynasty(null)
-                }}
-              >
-                清除筛选条件
-              </Button>
             </div>
-          )}
-        </div>
+          )
+        })}
       </div>
     </div>
   )

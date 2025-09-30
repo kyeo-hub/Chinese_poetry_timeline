@@ -7,9 +7,9 @@ import crypto from 'crypto'
 export const dynamic = 'force-dynamic'
 
 // 更安全的哈希函数
-async function hashIdentifier(input: string): Promise<string> {
+async function hashIdentifier(input: string, salt: string = ''): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(input);
+  const data = encoder.encode(input + salt);
   const hash = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hash));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -23,16 +23,24 @@ export async function POST(request: Request) {
     const { pathname } = new URL(request.url)
     
     // 获取客户端IP
-    const ip = request.headers.get('x-forwarded-for') || 
-               request.headers.get('x-real-ip') || 
-               'unknown'
+    let ip = request.headers.get('x-forwarded-for') || 
+             request.headers.get('x-real-ip') || 
+             'unknown'
+    
+    // 处理x-forwarded-for可能包含多个IP的情况，取第一个
+    if (ip !== 'unknown' && ip.includes(',')) {
+      ip = ip.split(',')[0].trim()
+    }
     
     // 获取User Agent
     const userAgent = request.headers.get('user-agent') || 'unknown'
     
+    // 使用环境变量中的盐值，如果没有则使用默认值
+    const salt = process.env.SITE_SALT || 'default_salt'
+    
     // 使用更安全的SHA-256哈希方法
-    const ipHash = await hashIdentifier(ip + process.env.SITE_SALT || 'default_salt')
-    const userAgentHash = await hashIdentifier(userAgent)
+    const ipHash = await hashIdentifier(ip, salt)
+    const userAgentHash = await hashIdentifier(userAgent, salt)
     
     // 1. 更新总访问量
     const { data: siteViewData } = await supabase
@@ -177,9 +185,15 @@ export async function GET(request: Request) {
       
       case 'unique':
         // 获取唯一访问者数量
-        const { count: uniqueCount } = await supabase
+        const { count: uniqueCount, error } = await supabase
           .from('unique_visitors')
           .select('*', { count: 'exact', head: true })
+        
+        if (error) {
+          console.error('Error fetching unique visitors count:', error)
+          return NextResponse.json({ count: 0 })
+        }
+        
         return NextResponse.json({ count: uniqueCount || 0 })
       
       default:

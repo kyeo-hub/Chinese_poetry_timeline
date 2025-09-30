@@ -1,13 +1,10 @@
 # Poetry timeline website
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
-
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/page1/v0-poetry-timeline-website)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/bXx1IvXuTZ1)
 
 ## Overview
 
-This is a poetry timeline website showcasing Chinese poets and their works in a chronological format. The project was initially built with [v0.app](https://v0.app) and continuously synced with deployments. It's hosted on the Vercel platform and provides a visual timeline interface to help users understand the history of Chinese poetry.
+This is a poetry timeline website showcasing Chinese poets and their works in a chronological format. The project is hosted on the Vercel platform and provides a visual timeline interface to help users understand the history of Chinese poetry.
 
 📖 [中文版本 README](README.zh-CN.md)
 

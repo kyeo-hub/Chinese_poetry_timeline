@@ -219,26 +219,6 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="https://poetry.taiwan.gov.tw/"
-                  target="_blank"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-start"
-                >
-                  <ExternalLink className="w-3 h-3 mr-2 mt-0.5 flex-shrink-0" />
-                  中华诗词网
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="http://www.shici.net/"
-                  target="_blank"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-start"
-                >
-                  <ExternalLink className="w-3 h-3 mr-2 mt-0.5 flex-shrink-0" />
-                  诗词名句网
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="https://www.shicimingju.com/"
                   target="_blank"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-start"
@@ -254,7 +234,7 @@ export function Footer() {
         {/* 版权信息 */}
         <div className="border-t border-border/50 mt-8 pt-6 text-center text-sm text-muted-foreground">
           <p>© {currentYear} 中华诗词时间轴. 保留所有权利.</p>
-          <p className="mt-1">此项目基于 v0 生成并在 Vercel 上部署</p>
+          <p className="mt-1">旨在学习和交流，请勿用于商业用途</p>
         </div>
       </div>
     </footer>

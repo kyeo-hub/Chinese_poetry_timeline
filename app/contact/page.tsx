@@ -1,9 +1,21 @@
+"use client"
+
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Mail, Github, MapPin } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+
   const contactInfo = [
     {
       icon: <Mail className="h-6 w-6" />,
@@ -30,6 +42,60 @@ export default function ContactPage() {
       link: "#"
     }
   ]
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // 显示正在发送的提示
+    const toastId = toast.loading("正在发送您的消息...");
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast.success("消息已成功发送！", {
+          id: toastId,
+          description: "感谢您的反馈，我们会尽快回复您。"
+        });
+        // 重置表单
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: ""
+        });
+      } else {
+        toast.error("发送失败", {
+          id: toastId,
+          description: result.message
+        });
+      }
+    } catch (error) {
+      toast.error("发送失败", {
+        id: toastId,
+        description: "发送消息时出现错误，请稍后再试。"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +146,7 @@ export default function ContactPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium mb-2">
@@ -91,6 +157,9 @@ export default function ContactPage() {
                       id="name"
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
                       placeholder="您的姓名"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                   <div>
@@ -102,6 +171,9 @@ export default function ContactPage() {
                       id="email"
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
                       placeholder="您的邮箱"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
@@ -114,6 +186,9 @@ export default function ContactPage() {
                     id="subject"
                     className="w-full px-3 py-2 border border-input rounded-md bg-background"
                     placeholder="反馈主题"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 <div>
@@ -125,10 +200,15 @@ export default function ContactPage() {
                     rows={5}
                     className="w-full px-3 py-2 border border-input rounded-md bg-background"
                     placeholder="请详细描述您的问题或建议..."
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
                   ></textarea>
                 </div>
                 <div className="flex justify-end">
-                  <Button type="submit">提交反馈</Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "提交中..." : "提交反馈"}
+                  </Button>
                 </div>
               </form>
             </CardContent>

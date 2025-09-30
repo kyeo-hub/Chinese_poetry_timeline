@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { Footer } from '@/components/footer'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: '中华诗词时间轴',
@@ -25,6 +26,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </div>
+        <Toaster />
         <Analytics />
       </body>
     </html>

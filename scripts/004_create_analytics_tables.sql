@@ -56,6 +56,7 @@ CREATE POLICY "Allow public read access to daily_views" ON daily_views FOR SELEC
 -- 创建插入和更新的策略（仅限服务端）
 CREATE POLICY "Allow insert for analytics" ON unique_visitors FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow update for analytics" ON unique_visitors FOR UPDATE USING (true);
+CREATE POLICY "Allow select for analytics" ON unique_visitors FOR SELECT USING (true);
 CREATE POLICY "Allow insert for analytics" ON site_views FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow update for analytics" ON site_views FOR UPDATE USING (true);
 CREATE POLICY "Allow insert for analytics" ON page_views FOR INSERT WITH CHECK (true);

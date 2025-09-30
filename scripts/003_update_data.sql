@@ -29,3 +29,10 @@ INSERT INTO poets (name, birth_year, death_year, dynasty, portrait_url, introduc
   ('鲍照', 414, 466, '魏晋南北朝', '/placeholder.svg?height=100&width=100', '南朝宋文学家，与颜延之、谢灵运合称"元嘉三大家"。', '元嘉三大家'),
   ('庾信', 513, 581, '魏晋南北朝', '/placeholder.svg?height=100&width=100', '南北朝时期文学家，由南入北的最著名的诗人，其诗赋为北朝文人之冠。', '集大成者')
 ON CONFLICT (name, dynasty) DO NOTHING;
+
+INSERT INTO poets (name, birth_year, death_year, dynasty, portrait_url, introduction, brief_tag) VALUES 
+('孔子', -551, -479, '春秋', '/placeholder.svg?height=100&width=100', '春秋末期思想家、教育家，儒家学派创始人，曾整理《诗经》，提出"诗教"思想，对中国诗歌发展有深远影响。', '诗教奠基者'),
+('尹吉甫', NULL, NULL, '春秋', '/placeholder.svg?height=100&width=100', '西周至春秋之际政治家、军事家，相传为《诗经》中多篇诗歌的作者，被誉为"中华诗祖"。', '中华诗祖'),
+('老子', NULL, NULL, '春秋', '/placeholder.svg?height=100&width=100', '春秋末期思想家，道家学派创始人，《道德经》以诗化语言阐述哲学，对后世哲理诗有深远影响。', '哲理诗先驱')
+ON CONFLICT (name, dynasty) DO NOTHING;
+

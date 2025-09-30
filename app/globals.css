@@ -5,9 +5,9 @@
 
 :root {
   /* Updated color palette for Chinese poetry theme */
-  --background: oklch(1 0 0); /* Pure white */
+  --background: #d5d2bc; /* Warm beige background */
   --foreground: oklch(0.35 0 0); /* Dark slate gray */
-  --card: oklch(0.98 0 0); /* Light gray card background */
+  --card: #f0efe2; /* Light cream card background */
   --card-foreground: oklch(0.25 0 0); /* Darker text on cards */
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.35 0 0);
@@ -30,7 +30,7 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.3rem; /* Softer corners for traditional feel */
-  --sidebar: oklch(0.98 0 0);
+  --sidebar: #f0efe2; /* Light cream sidebar to match cards */
   --sidebar-foreground: oklch(0.35 0 0);
   --sidebar-primary: oklch(0.45 0.15 160);
   --sidebar-primary-foreground: oklch(1 0 0);

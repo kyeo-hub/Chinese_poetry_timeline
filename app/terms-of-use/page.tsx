@@ -123,7 +123,7 @@ export default function TermsOfUsePage() {
                 如果您对这些使用条款有任何疑问，请通过以下方式联系我们：
               </p>
               <p className="mb-4">
-                邮箱：<Link href="mailto:kyeooeyk@gmail.com" className="text-primary hover:underline">kyeooeyk@gmail.com</Link>
+                邮箱：<Link href="mailto:kyeo@kky.ac.cn" className="text-primary hover:underline">kyeo@kky.ac.cn</Link>
               </p>
             </section>
           </article>

@@ -14,8 +14,8 @@ export default function FAQPage() {
       answer: "网站内容仅供个人学习和研究使用。如需商业用途，请联系版权所有者。详细信息请查看我们的使用条款页面。"
     },
     {
-      question: "如何提交错误报告或建议？",
-      answer: "您可以通过联系我们页面的反馈表单，或直接发送邮件至 kyeooeyk@gmail.com 来提交您的意见和建议。"
+      question: "如何提交意见和建议？",
+      answer: "您可以通过联系我们页面的反馈表单，或直接发送邮件至 kyeo@kky.ac.cn 来提交您的意见和建议。"
     },
     {
       question: "网站支持哪些设备和浏览器？",

@@ -36,6 +36,7 @@ This is a poetry timeline website showcasing Chinese poets and their works in a 
 
 ### Data Sources
 - Chinese poetry datasets from [chinese-poetry/chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)
+- Website source code hosted on [kyeo-hub/Chinese_poetry_timeline](https://github.com/kyeo-hub/Chinese_poetry_timeline)
 - AI-generated content for translations, backgrounds, and appreciation sections
 - Manually curated poet biographies and dynasty information
 

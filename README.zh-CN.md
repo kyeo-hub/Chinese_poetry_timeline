@@ -34,6 +34,7 @@
 
 ### 数据来源
 - 来自 [chinese-poetry/chinese-poetry](https://github.com/chinese-poetry/chinese-poetry) 的中文诗词数据集
+- 网站源代码托管于 [kyeo-hub/Chinese_poetry_timeline](https://github.com/kyeo-hub/Chinese_poetry_timeline)
 - 使用 AI 生成诗词翻译、背景和赏析内容
 - 手工整理的诗人传记和朝代信息
 

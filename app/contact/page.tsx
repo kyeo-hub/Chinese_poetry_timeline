@@ -21,17 +21,17 @@ export default function ContactPage() {
       icon: <Mail className="h-6 w-6" />,
       title: "邮箱联系",
       description: "通过电子邮件与我们联系",
-      content: "kyeooeyk@gmail.com",
+       content: "kyeo@kky.ac.cn",
       action: "发送邮件",
-      link: "mailto:kyeooeyk@gmail.com"
+      link: "mailto:kyeo@kky.ac.cn"
     },
     {
       icon: <Github className="h-6 w-6" />,
       title: "GitHub 项目",
       description: "查看源代码和项目进展",
-      content: "github.com/your-project",
+      content: "github.com/kyeo-hub/Chinese_poetry_timeline",
       action: "访问项目",
-      link: "https://github.com"
+      link: "https://github.com/kyeo-hub/Chinese_poetry_timeline"
     },
     {
       icon: <MapPin className="h-6 w-6" />,

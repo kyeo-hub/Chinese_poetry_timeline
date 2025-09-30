@@ -119,16 +119,16 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="mailto:kyeooeyk@gmail.com"
+                  href="mailto:kyeo@kky.ac.cn"
                   className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  kyeooeyk@gmail.com
+                  kyeo@kky.ac.cn
                 </Link>
               </li>
               <li>
                 <Link
-                  href="https://github.com"
+                  href="https://github.com/kyeo-hub/Chinese_poetry_timeline"
                   target="_blank"
                   className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
                 >
